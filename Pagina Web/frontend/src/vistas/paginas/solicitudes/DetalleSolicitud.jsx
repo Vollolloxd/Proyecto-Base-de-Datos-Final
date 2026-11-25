@@ -5,6 +5,7 @@ import { useDatos } from '../../../controladores/useDatos.js';
 import { useGestorSolicitud } from '../../../controladores/useGestorSolicitud.js';
 import { RUTA_PRODUCTOS } from '../../../modelos/mantenedoresModelo.js';
 import { dinero } from '../../../utilidades/formato.js';
+import { separarPago } from '../../../utilidades/pagoElegido.js';
 import CrudPagina from '../../componentes/CrudPagina.jsx';
 import Insignia from '../../componentes/Insignia.jsx';
 import Modal from '../../componentes/Modal.jsx';
@@ -14,12 +15,14 @@ function Contenido({ solicitud, alCerrar, alCambiar }) {
     const [total, setTotal] = useState(0);
     const gestor = useGestorSolicitud(solicitud, { alCambiar, alCerrar });
     const editable = solicitud.ESTADO === 'BORRADOR';
+    const pago = separarPago(solicitud.OBSERVACIONES);
 
     return (
         <Modal titulo={`Solicitud folio ${solicitud.NUMERO_FOLIO}`} abierto alCerrar={alCerrar} ancho="grande">
             <p className="mb-3 text-sm text-suave">
                 {solicitud.CLIENTE} · <Insignia valor={solicitud.ESTADO} /> · Total {dinero(total)}
-                {solicitud.OBSERVACIONES && <><br />Observaciones: {solicitud.OBSERVACIONES}</>}
+                {pago.metodo && <><br />Forma de pago elegida por el cliente: <strong className="text-tinta">{pago.metodo}</strong></>}
+                {pago.nota && <><br />Observaciones: {pago.nota}</>}
             </p>
             <CrudPagina
                 embebido recurso="detalle-solicitud" ids={['ID_SOLICITUD', 'ID_PRODUCTO']}

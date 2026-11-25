@@ -1,6 +1,7 @@
 // Controlador de los pedidos del cliente web (sus solicitudes de compra)
 const pedidoModelo = require('../modelos/pedidoModelo');
-const solicitudModelo = require('../modelos/solicitudModelo');
+const metodoPagoModelo = require('../modelos/metodoPagoModelo');
+const pagoServicio = require('../servicios/pagoServicio');
 const asincrono = require('../utilidades/asincrono');
 
 const listar = asincrono(async (req, res) => {
@@ -43,8 +44,15 @@ const quitarProducto = asincrono(async (req, res) => {
 });
 
 const enviar = asincrono(async (req, res) => {
-    await solicitudModelo.enviar(req.params.id, req.usuario);
+    await pagoServicio.enviarConPago(req.params.id, (req.body || {}).ID_METODO_PAGO, req.usuario);
     res.json({ ok: true });
 });
 
-module.exports = { listar, crear, modificar, anular, listarProductos, agregarProducto, cambiarCantidad, quitarProducto, enviar };
+const metodosPago = asincrono(async (req, res) => {
+    const metodos = await metodoPagoModelo.listar(true, req.usuario);
+    res.json(metodos.map(({ ID_METODO_PAGO, NOMBRE, DESCRIPCION }) => ({ ID_METODO_PAGO, NOMBRE, DESCRIPCION })));
+});
+
+module.exports = {
+    listar, crear, modificar, anular, listarProductos, agregarProducto, cambiarCantidad, quitarProducto, enviar, metodosPago
+};

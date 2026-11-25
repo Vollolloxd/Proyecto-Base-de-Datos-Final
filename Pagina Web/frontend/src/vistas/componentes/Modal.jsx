@@ -10,6 +10,8 @@ export default function Modal({ titulo, abierto, alCerrar, children, ancho = 'no
     const [montado, setMontado] = useState(abierto);
     const ultimo = useRef({ titulo, children });
     const caja = useRef(null);
+    const cerrar = useRef(alCerrar);
+    cerrar.current = alCerrar;
     if (abierto) ultimo.current = { titulo, children };
 
     useEffect(() => {
@@ -24,7 +26,7 @@ export default function Modal({ titulo, abierto, alCerrar, children, ancho = 'no
     useEffect(() => {
         if (!abierto) return undefined;
         const anterior = document.activeElement;
-        const tecla = (e) => e.key === 'Escape' && alCerrar();
+        const tecla = (e) => e.key === 'Escape' && cerrar.current();
         window.addEventListener('keydown', tecla);
         document.body.style.overflow = 'hidden';
         requestAnimationFrame(() => {
@@ -35,7 +37,7 @@ export default function Modal({ titulo, abierto, alCerrar, children, ancho = 'no
             document.body.style.overflow = '';
             if (anterior && typeof anterior.focus === 'function') anterior.focus();
         };
-    }, [abierto, alCerrar]);
+    }, [abierto]);
 
     if (!montado && !abierto) return null;
     const saliendo = !abierto;

@@ -14,4 +14,6 @@ async function resolver(idSolicitud, decision, usuario) {
     return salida.P_ID_VENTA;
 }
 
-module.exports = { enviar, resolver };
+const listar = (usuario) => db.listar('CEMJ_PA_SOLICITUD_LISTAR', { P_ID_CLIENTE: null }, usuario);
+
+module.exports = { enviar, resolver, listar };

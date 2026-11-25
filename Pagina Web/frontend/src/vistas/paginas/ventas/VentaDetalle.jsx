@@ -40,7 +40,9 @@ export default function VentaDetalle() {
             <div className="mb-6 grid grid-cols-2 gap-4 rounded-lg border border-borde bg-white p-5 md:grid-cols-4">
                 <Dato etiqueta="Creada">{fechaHora(venta.FECHA_CREACION)}</Dato>
                 <Dato etiqueta="Confirmada">{fechaHora(venta.FECHA_CONFIRMACION) || '—'}</Dato>
-                <Dato etiqueta="Pago">{venta.METODO_PAGO || '—'}</Dato>
+                <Dato etiqueta="Pago">
+                    {venta.METODO_PAGO || (venta.METODO_ELEGIDO ? `${venta.METODO_ELEGIDO} (elegido por el cliente)` : '—')}
+                </Dato>
                 <Dato etiqueta="Vendedor">{venta.VENDEDOR?.toLowerCase()}</Dato>
                 {venta.ESTADO === 'ANULADA' && (
                     <Dato etiqueta="Anulada" ancho>{fechaHora(venta.FECHA_ANULACION)} · {venta.MOTIVO_ANULACION}</Dato>
@@ -77,11 +79,17 @@ export default function VentaDetalle() {
                     <PanelAccion titulo="Confirmar venta y registrar pago"
                         ayuda={`Descuenta el stock y registra el pago por el total (${dinero(v.total)}).`}
                         onSubmit={v.confirmar}>
+                        {venta.METODO_ELEGIDO && (
+                            <p className="text-sm">
+                                Método de pago elegido por el cliente: <strong>{venta.METODO_ELEGIDO}</strong>
+                            </p>
+                        )}
                         <Formulario valores={v.pago} alCambiar={v.setPago} campos={[
                             { nombre: 'ID_METODO_PAGO', etiqueta: 'Método de pago', tipo: 'select', requerido: true,
-                                opciones: v.metodos.map((m) => ({ valor: m.ID_METODO_PAGO, texto: m.NOMBRE })) },
-                            { nombre: 'REFERENCIA', etiqueta: 'Referencia (opcional)', placeholder: 'N° de transferencia' }
+                                visible: () => !venta.METODO_ELEGIDO,
+                                opciones: v.metodos.map((m) => ({ valor: m.ID_METODO_PAGO, texto: m.NOMBRE })) }
                         ]} />
+                        <p className="text-xs text-suave">El N° de referencia del pago se asigna automáticamente al confirmar.</p>
                         <button type="submit" className="btn self-start" disabled={v.lineas.length === 0}>Confirmar venta</button>
                     </PanelAccion>
                 )}

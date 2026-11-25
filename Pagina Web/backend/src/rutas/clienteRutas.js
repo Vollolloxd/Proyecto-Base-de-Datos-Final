@@ -26,5 +26,6 @@ misSolicitudes.delete('/:id/productos/:idProducto', pedidoPropio, pedidos.quitar
 misSolicitudes.post('/:id/enviar', pedidoPropio, pedidos.enviar);
 
 router.use('/mis-solicitudes', misSolicitudes);
+router.get('/metodos-pago', permiso('MIS_SOLICITUDES'), pedidos.metodosPago);
 
 module.exports = router;

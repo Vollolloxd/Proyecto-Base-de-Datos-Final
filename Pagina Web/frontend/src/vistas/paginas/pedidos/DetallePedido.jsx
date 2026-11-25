@@ -14,7 +14,9 @@ const EXPLICACION = {
 };
 
 export default function DetallePedido({ pedido, alCambiar }) {
-    const { lineas, editable, total, cambiarCantidad, quitar, anular, enviar } = usePedido(pedido, alCambiar);
+    const {
+        lineas, editable, total, metodos, metodo, setMetodo, pagoElegido, cambiarCantidad, quitar, anular, enviar
+    } = usePedido(pedido, alCambiar);
 
     return (
         <div className="tarjeta">
@@ -22,6 +24,9 @@ export default function DetallePedido({ pedido, alCambiar }) {
                 <div>
                     <h2 className="flex flex-wrap items-center gap-2">Pedido folio {pedido.NUMERO_FOLIO} <Insignia valor={pedido.ESTADO} /></h2>
                     <p className="mt-1 text-sm text-suave">{EXPLICACION[pedido.ESTADO]}</p>
+                    {!editable && pagoElegido && (
+                        <p className="mt-1 text-sm text-suave">Forma de pago: <strong className="text-tinta">{pagoElegido}</strong></p>
+                    )}
                 </div>
                 <div className="text-2xl font-semibold tabular-nums text-vino">{dinero(total)}</div>
             </div>
@@ -49,12 +54,29 @@ export default function DetallePedido({ pedido, alCambiar }) {
                     </button>
                 ) : undefined}
             />
+            {editable && lineas.length > 0 && (
+                <fieldset className="mt-6">
+                    <legend className="text-sm font-semibold">¿Cómo vas a pagar? <span className="text-peligro" aria-hidden="true">*</span></legend>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                        {metodos.map((m) => (
+                            <label key={m.ID_METODO_PAGO}
+                                className={`casilla cursor-pointer rounded-md border px-3 py-2 text-sm ${String(metodo) === String(m.ID_METODO_PAGO) ? 'border-vino bg-vino/5' : 'border-borde'}`}>
+                                <input type="radio" name={`pago-${pedido.ID_SOLICITUD}`} value={m.ID_METODO_PAGO}
+                                    checked={String(metodo) === String(m.ID_METODO_PAGO)}
+                                    onChange={(e) => setMetodo(e.target.value)} />
+                                {m.NOMBRE}
+                            </label>
+                        ))}
+                    </div>
+                    <p className="mt-1 text-xs text-suave">La viña registrará el pago con el método que elijas.</p>
+                </fieldset>
+            )}
             {editable && (
                 <Pie>
                     <button type="button" className="btn btn-sec" onClick={anular}>
                         Anular pedido
                     </button>
-                    <button type="button" className="btn" disabled={lineas.length === 0} onClick={enviar}>
+                    <button type="button" className="btn" disabled={lineas.length === 0 || !metodo} onClick={enviar}>
                         Enviar pedido
                     </button>
                 </Pie>

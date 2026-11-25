@@ -22,8 +22,8 @@ export function useVentaDetalle(id) {
 
     async function ejecutar(operacion, mensaje) {
         try {
-            await operacion();
-            avisar(mensaje);
+            const resultado = await operacion();
+            avisar(typeof mensaje === 'function' ? mensaje(resultado) : mensaje);
             recargarTodo();
             return true;
         } catch (err) {
@@ -39,7 +39,8 @@ export function useVentaDetalle(id) {
 
     function confirmar(e) {
         e.preventDefault();
-        ejecutar(() => ventasModelo.confirmar(id, pago), 'Venta confirmada: stock descontado y pago registrado');
+        ejecutar(() => ventasModelo.confirmar(id, { ID_METODO_PAGO: pago.ID_METODO_PAGO }),
+            (r) => `Venta confirmada: stock descontado y pago registrado${r?.REFERENCIA ? ` (referencia ${r.REFERENCIA})` : ''}`);
     }
 
     function anular(e) {

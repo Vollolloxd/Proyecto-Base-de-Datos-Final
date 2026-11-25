@@ -8,7 +8,9 @@ export const rutaProductos = (idSolicitud) => `${rutaPedido(idSolicitud)}/produc
 export const listar = () => api(RUTA_MIS_PEDIDOS);
 export const crear = () => api(RUTA_MIS_PEDIDOS, { metodo: 'POST', cuerpo: {} });
 export const anular = (idSolicitud) => api(rutaPedido(idSolicitud), { metodo: 'DELETE' });
-export const enviar = (idSolicitud) => api(`${rutaPedido(idSolicitud)}/enviar`, { metodo: 'POST' });
+export const enviar = (idSolicitud, idMetodoPago) =>
+    api(`${rutaPedido(idSolicitud)}/enviar`, { metodo: 'POST', cuerpo: { ID_METODO_PAGO: idMetodoPago } });
+export const RUTA_METODOS_PAGO_CLIENTE = '/cliente/metodos-pago';
 
 export const listarProductos = (idSolicitud) => api(rutaProductos(idSolicitud));
 export const agregarProducto = (idSolicitud, idProducto, cantidad) =>
