@@ -1,0 +1,74 @@
+# Viña La Alborada - base de datos Oracle + aplicacion web
+#
+#   docker compose up -d              -> base + app en http://localhost:3001
+#   docker compose --profile dev up   -> ademas, modo desarrollo con recarga
+#                                        automatica en http://localhost:5173
+name: vina-alborada
+
+services:
+  # Oracle: la primera vez instala "script final.sql" y "DATOS_DEMO.sql"
+  db:
+    image: gvenzl/oracle-free:23-slim
+    environment:
+      ORACLE_PASSWORD: Alborada2026        # clave de SYS y SYSTEM
+      ALBORADA_CLAVE: Alborada2026         # clave del esquema del proyecto
+    ports:
+      - "1521:1521"                        # para conectarse con SQL Developer
+    volumes:
+      - oracle-datos:/opt/oracle/oradata
+      - ./docker/oracle:/container-entrypoint-initdb.d:ro
+      - "./Base de datos:/alborada/sql:ro"
+    healthcheck:
+      # Lista cuando Oracle responde Y ya se cargo el proyecto con sus datos
+      test: ["CMD-SHELL", "healthcheck.sh && test -f /opt/oracle/oradata/alborada_lista"]
+      interval: 15s
+      timeout: 10s
+      retries: 80
+      start_period: 60s
+
+  # App web (API Node + React compilado)
+  web:
+    build: "./Pagina Web"
+    environment:
+      PUERTO: 3001
+      DB_USUARIO: ALBORADA
+      DB_CLAVE: Alborada2026
+      DB_CONEXION: db:1521/FREEPDB1
+      JWT_SECRETO: vina-alborada-docker-cambiar-este-secreto
+    ports:
+      - "3001:3001"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Desarrollo: monta el codigo de "Pagina Web"; al guardar un archivo la
+  # pagina se recarga sola (frontend con Vite, backend con nodemon).
+  web-dev:
+    profiles: ["dev"]
+    image: node:22-slim
+    working_dir: /app
+    environment:
+      PUERTO: 3001
+      DB_USUARIO: ALBORADA
+      DB_CLAVE: Alborada2026
+      DB_CONEXION: db:1521/FREEPDB1
+      JWT_SECRETO: vina-alborada-dev
+      VITE_POLLING: "1"
+    volumes:
+      - "./Pagina Web:/app"
+      - /app/backend/node_modules
+      - /app/frontend/node_modules
+    ports:
+      - "5173:5173"
+    command: >
+      sh -c "cd /app/backend && npm install &&
+             cd /app/frontend && npm install &&
+             (cd /app/backend && npx --yes nodemon@3.1.9 --legacy-watch src/servidor.js &) &&
+             npx vite --host 0.0.0.0"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  oracle-datos:

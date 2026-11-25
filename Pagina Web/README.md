@@ -11,7 +11,7 @@ Aplicación web del proyecto final INF324 (ES3). Arquitectura en dos capas:
 ## Requisitos
 
 - Node.js 18 o superior.
-- La base instalada: `Scripts/.../Rama 2A.../PROYECTO_COMPLETO.sql` y luego `DATOS_DEMO.sql`.
+- La base instalada: `Base de datos/script final.sql` y luego `Base de datos/DATOS_DEMO.sql` (o todo con Docker, ver el README principal).
 
 ## Iniciar (modo presentación)
 
