@@ -9,7 +9,7 @@ export default function VerificacionEdad({ children }) {
 
     return (
         <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-carbon px-4 py-10">
-            <img src="/img/vinedo.jpg" alt="" className="absolute inset-0 h-full w-full object-cover opacity-35" />
+            <img src="/img/vinedo-alborada.webp" alt="" className="absolute inset-0 h-full w-full object-cover opacity-35" />
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(20,18,16,0.55)_0%,rgba(20,18,16,0.92)_75%)]" />
 
             <div className="relative w-full max-w-[480px] animate-escalar rounded-md bg-marfil px-8 py-10 text-center shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)] sm:px-12"

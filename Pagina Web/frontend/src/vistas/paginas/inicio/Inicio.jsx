@@ -50,7 +50,7 @@ export default function Inicio() {
             {(tiene('SOLICITUDES') || r.veStock) && (
                 <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
                     {tiene('SOLICITUDES') && (
-                        <PanelLista titulo="Solicitudes por revisar" enlace="/solicitudes" textoEnlace="Ver solicitudes">
+                        <PanelLista titulo="Solicitudes web pendientes" enlace="/solicitudes" textoEnlace="Ver solicitudes">
                             {pendientes.length === 0 ? <ListaVacia texto="No hay solicitudes pendientes." /> : (
                                 <ul className="divide-y divide-stone-100">
                                     {pendientes.slice(0, 5).map((s) => (

@@ -1,31 +1,37 @@
-// Controlador de la revision de una solicitud web (G3): enviar, aceptar (genera venta) o rechazar
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import * as solicitudesModelo from '../modelos/solicitudesModelo.js';
 import { useMensajes } from './MensajesContexto.jsx';
 
 export function useGestorSolicitud(solicitud, { alCambiar, alCerrar }) {
     const { avisar } = useMensajes();
-    const navegar = useNavigate();
+    const [accionEnCurso, setAccionEnCurso] = useState(null);
 
-    async function ejecutar(operacion, mensaje) {
+    async function ejecutar(accion, mensaje, motivo) {
+        setAccionEnCurso(accion);
         try {
-            const r = await operacion();
+            await solicitudesModelo[accion](solicitud.ID_SOLICITUD, motivo);
             avisar(mensaje);
             alCambiar();
             alCerrar();
-            if (r?.ID_VENTA) {
-                avisar(`Se generó la venta digital N° ${r.ID_VENTA}: confírmela con el pago`);
-                navegar(`/ventas/${r.ID_VENTA}`);
-            }
-        } catch (err) {
-            avisar(err.message, 'error');
+        } catch (error) {
+            avisar(error.message, 'error');
+        } finally {
+            setAccionEnCurso(null);
         }
     }
 
-    return {
-        enviar: () => ejecutar(() => solicitudesModelo.enviar(solicitud.ID_SOLICITUD),
-            'Solicitud enviada: queda pendiente de revisión'),
-        rechazar: () => ejecutar(() => solicitudesModelo.resolver(solicitud.ID_SOLICITUD, 'RECHAZADA'), 'Solicitud rechazada'),
-        aceptar: () => ejecutar(() => solicitudesModelo.resolver(solicitud.ID_SOLICITUD, 'ACEPTADA'), 'Solicitud aceptada')
-    };
+    function aceptar() {
+        return ejecutar('aceptar', 'Solicitud aceptada');
+    }
+
+    function anular() {
+        if (!window.confirm(`¿Anular la solicitud folio ${solicitud.NUMERO_FOLIO}?`)) return;
+        return ejecutar('anular', 'Solicitud anulada');
+    }
+
+    function rechazar(motivo) {
+        return ejecutar('anular', 'Solicitud rechazada', motivo);
+    }
+
+    return { accionEnCurso, aceptar, anular, rechazar };
 }

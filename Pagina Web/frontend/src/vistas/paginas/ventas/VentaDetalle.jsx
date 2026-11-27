@@ -1,5 +1,5 @@
 // Pagina: detalle de una venta (productos, agregar, confirmar con pago y anular)
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useVentaDetalle } from '../../../controladores/useVentaDetalle.js';
 import { dinero, fechaHora } from '../../../utilidades/formato.js';
 import Cabecera from '../../componentes/Cabecera.jsx';
@@ -8,6 +8,7 @@ import Formulario from '../../componentes/Formulario.jsx';
 import Insignia from '../../componentes/Insignia.jsx';
 import Tabla from '../../componentes/Tabla.jsx';
 import { Dato, PanelAccion, Volver } from './partes.jsx';
+import BuscadorProducto from './BuscadorProducto.jsx';
 
 export default function VentaDetalle() {
     const { id } = useParams();
@@ -23,6 +24,8 @@ export default function VentaDetalle() {
             </section>
         );
     }
+
+    const seleccionado = v.activos.find((producto) => String(producto.ID_PRODUCTO) === String(v.agregar.ID_PRODUCTO));
 
     return (
         <section>
@@ -40,9 +43,13 @@ export default function VentaDetalle() {
             <div className="mb-6 grid grid-cols-2 gap-4 rounded-lg border border-borde bg-white p-5 md:grid-cols-4">
                 <Dato etiqueta="Creada">{fechaHora(venta.FECHA_CREACION)}</Dato>
                 <Dato etiqueta="Confirmada">{fechaHora(venta.FECHA_CONFIRMACION) || '—'}</Dato>
-                <Dato etiqueta="Pago">
-                    {venta.METODO_PAGO || (venta.METODO_ELEGIDO ? `${venta.METODO_ELEGIDO} (elegido por el cliente)` : '—')}
-                </Dato>
+                <Dato etiqueta="Método de pago">{venta.METODO_PAGO || '—'}</Dato>
+                {venta.ID_TRANSACCION && (
+                    <Dato etiqueta="ID de transacción" ancho><span className="break-all">{venta.ID_TRANSACCION}</span></Dato>
+                )}
+                {v.referencia && (
+                    <Dato etiqueta="Referencia de pago" ancho><span className="break-all">{v.referencia}</span></Dato>
+                )}
                 <Dato etiqueta="Vendedor">{venta.VENDEDOR?.toLowerCase()}</Dato>
                 {venta.ESTADO === 'ANULADA' && (
                     <Dato etiqueta="Anulada" ancho>{fechaHora(venta.FECHA_ANULACION)} · {venta.MOTIVO_ANULACION}</Dato>
@@ -65,33 +72,37 @@ export default function VentaDetalle() {
                 {venta.ESTADO === 'BORRADOR' && venta.CANAL_VENTA === 'PRESENCIAL' && (
                     <PanelAccion titulo="Agregar producto" ayuda="Se usa el precio vigente y se valida el stock disponible."
                         onSubmit={v.agregarProducto}>
+                        <BuscadorProducto productos={v.activos} consulta={v.agregar.BUSCAR_PRODUCTO ?? ''}
+                            seleccionado={seleccionado}
+                            alBuscar={(BUSCAR_PRODUCTO) => v.setAgregar((anterior) => ({
+                                ...anterior, BUSCAR_PRODUCTO, ID_PRODUCTO: undefined
+                            }))}
+                            alSeleccionar={(producto) => v.setAgregar((anterior) => ({
+                                ...anterior, ID_PRODUCTO: producto.ID_PRODUCTO
+                            }))} />
                         <Formulario valores={v.agregar} alCambiar={v.setAgregar} campos={[
-                            { nombre: 'ID_PRODUCTO', etiqueta: 'Producto', tipo: 'select', requerido: true, ancho: 'completo',
-                                opciones: v.activos.map((p) => ({ valor: p.ID_PRODUCTO,
-                                    texto: `${p.NOMBRE} · ${dinero(p.PRECIO_ACTUAL)} · stock ${p.STOCK_ACTUAL}` })) },
                             { nombre: 'CANTIDAD', etiqueta: 'Cantidad', tipo: 'number', requerido: true, min: 1 }
                         ]} />
-                        <button type="submit" className="btn self-start">Agregar</button>
+                        <button type="submit" className="btn self-start" disabled={!seleccionado}>Agregar</button>
                     </PanelAccion>
                 )}
 
-                {venta.ESTADO === 'BORRADOR' && (
+                {venta.ESTADO === 'BORRADOR' && venta.CANAL_VENTA === 'PRESENCIAL' && (
                     <PanelAccion titulo="Confirmar venta y registrar pago"
                         ayuda={`Descuenta el stock y registra el pago por el total (${dinero(v.total)}).`}
                         onSubmit={v.confirmar}>
-                        {venta.METODO_ELEGIDO && (
-                            <p className="text-sm">
-                                Método de pago elegido por el cliente: <strong>{venta.METODO_ELEGIDO}</strong>
-                            </p>
-                        )}
                         <Formulario valores={v.pago} alCambiar={v.setPago} campos={[
                             { nombre: 'ID_METODO_PAGO', etiqueta: 'Método de pago', tipo: 'select', requerido: true,
-                                visible: () => !venta.METODO_ELEGIDO,
                                 opciones: v.metodos.map((m) => ({ valor: m.ID_METODO_PAGO, texto: m.NOMBRE })) }
                         ]} />
-                        <p className="text-xs text-suave">El N° de referencia del pago se asigna automáticamente al confirmar.</p>
-                        <button type="submit" className="btn self-start" disabled={v.lineas.length === 0}>Confirmar venta</button>
+                        <button type="submit" className="btn self-start" disabled={v.confirmando || v.lineas.length === 0}>
+                            {v.confirmando ? 'Confirmando…' : 'Confirmar venta'}
+                        </button>
                     </PanelAccion>
+                )}
+
+                {venta.ESTADO === 'BORRADOR' && venta.CANAL_VENTA === 'DIGITAL' && (
+                    <Link to="/solicitudes" className="btn btn-sec justify-self-start">Consultar solicitudes web</Link>
                 )}
 
                 {venta.ESTADO === 'CONFIRMADA' && (

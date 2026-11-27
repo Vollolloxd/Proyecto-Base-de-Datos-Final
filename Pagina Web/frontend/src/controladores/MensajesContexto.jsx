@@ -1,5 +1,6 @@
 // Controlador de avisos: cola de mensajes de exito y error con cierre automatico
-import { createContext, useCallback, useContext, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { etiquetaValidacion, mensajeValidacion } from '../utilidades/validacionFormulario.js';
 import Avisos from '../vistas/componentes/Avisos.jsx';
 
 const ContextoMensajes = createContext({ avisar: () => {} });
@@ -19,6 +20,27 @@ export function ProveedorMensajes({ children }) {
         setMensajes((m) => [...m, { id, texto, tipo }]);
         setTimeout(() => quitar(id), duracion);
     }, [quitar]);
+
+    useEffect(() => {
+        let pendiente = false;
+        function mostrarValidacion(evento) {
+            const campo = evento.target;
+            if (!campo.form || !campo.validity) return;
+            evento.preventDefault();
+            if (pendiente) return;
+            pendiente = true;
+            queueMicrotask(() => {
+                pendiente = false;
+                if (!campo.isConnected) return;
+                campo.focus();
+                const etiqueta = etiquetaValidacion(campo);
+                const mensaje = mensajeValidacion(campo);
+                avisar(etiqueta ? `${etiqueta}. ${mensaje}` : mensaje, 'error');
+            });
+        }
+        document.addEventListener('invalid', mostrarValidacion, true);
+        return () => document.removeEventListener('invalid', mostrarValidacion, true);
+    }, [avisar]);
 
     return (
         <ContextoMensajes.Provider value={{ avisar }}>

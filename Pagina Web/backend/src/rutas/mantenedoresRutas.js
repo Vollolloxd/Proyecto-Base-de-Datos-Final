@@ -10,8 +10,8 @@ router.param('recurso', cargarRecurso);
 
 router.get('/:recurso', lectura, mantenedores.listar);
 router.post('/:recurso', escritura, mantenedores.crear);
-router.put('/:recurso/:id/:id2?', escritura, mantenedores.modificar);
-router.delete('/:recurso/:id/:id2?', escritura, mantenedores.eliminar);
+router.put('/:recurso/:id{/:id2}', escritura, mantenedores.modificar);
+router.delete('/:recurso/:id{/:id2}', escritura, mantenedores.eliminar);
 router.patch('/:recurso/:id/reactivar', escritura, mantenedores.reactivar);
 
 module.exports = router;

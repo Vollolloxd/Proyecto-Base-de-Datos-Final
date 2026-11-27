@@ -1,4 +1,4 @@
-// Vista: pie de la tienda con logo, aviso legal, enlaces y credito de la foto
+// Vista: pie de la tienda con logo, aviso legal y enlaces
 import { Link } from 'react-router-dom';
 import { useSesion } from '../../controladores/SesionContexto.jsx';
 import { irASeccion } from '../../utilidades/navegacion.js';
@@ -34,13 +34,6 @@ export default function PieTienda({ hayDestacados, hayUva }) {
                 </nav>
                 <p className="text-sm text-inverso-suave md:col-span-4">
                     Proyecto INF324 Base de Datos.
-                </p>
-            </div>
-            <div className="border-t border-carbon-borde">
-                <p className="mx-auto max-w-tienda px-4 py-5 text-xs text-inverso-suave/80 sm:px-8 lg:px-14">
-                    Foto del viñedo: <a className="text-inverso-suave underline" href="https://commons.wikimedia.org/wiki/File:Row_upon_row_across_gently_rolling_valleys,_Matetic_Wines,_Chile_(38609005014).jpg"
-                        target="_blank" rel="noreferrer">Winniepix</a>, licencia <a className="text-inverso-suave underline" href="https://creativecommons.org/licenses/by/2.0"
-                        target="_blank" rel="noreferrer">CC BY 2.0</a> (Wikimedia Commons).
                 </p>
             </div>
         </footer>

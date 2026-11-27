@@ -48,6 +48,9 @@ export default function Formulario({ campos, valores, alCambiar, modo }) {
                             <input id={id} type={c.tipo || 'text'} value={valor}
                                 onChange={(e) => cambiar(e.target.value)} disabled={deshabilitado}
                                 required={requerido} placeholder={c.placeholder}
+                                onKeyDown={c.tipo === 'search' ? (e) => {
+                                    if (e.key === 'Enter') e.preventDefault();
+                                } : undefined}
                                 min={c.min} max={c.max} step={c.paso} autoComplete={c.autocompletar || 'off'} />
                         );
                     }

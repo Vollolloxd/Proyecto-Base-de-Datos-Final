@@ -1,6 +1,6 @@
 // Ventana modal con foco gestionado
 import { X } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 const ANCHOS = { chico: 'max-w-md', normal: 'max-w-2xl', grande: 'max-w-4xl' };
@@ -10,8 +10,7 @@ export default function Modal({ titulo, abierto, alCerrar, children, ancho = 'no
     const [montado, setMontado] = useState(abierto);
     const ultimo = useRef({ titulo, children });
     const caja = useRef(null);
-    const cerrar = useRef(alCerrar);
-    cerrar.current = alCerrar;
+    const cerrarConEscape = useEffectEvent(() => alCerrar());
     if (abierto) ultimo.current = { titulo, children };
 
     useEffect(() => {
@@ -26,13 +25,14 @@ export default function Modal({ titulo, abierto, alCerrar, children, ancho = 'no
     useEffect(() => {
         if (!abierto) return undefined;
         const anterior = document.activeElement;
-        const tecla = (e) => e.key === 'Escape' && cerrar.current();
+        const tecla = (e) => e.key === 'Escape' && cerrarConEscape();
         window.addEventListener('keydown', tecla);
         document.body.style.overflow = 'hidden';
-        requestAnimationFrame(() => {
+        const foco = requestAnimationFrame(() => {
             if (caja.current && !caja.current.contains(document.activeElement)) caja.current.focus();
         });
         return () => {
+            cancelAnimationFrame(foco);
             window.removeEventListener('keydown', tecla);
             document.body.style.overflow = '';
             if (anterior && typeof anterior.focus === 'function') anterior.focus();

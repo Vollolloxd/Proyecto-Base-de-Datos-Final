@@ -22,9 +22,11 @@ export default function CrudPagina({
     puedeEliminar = () => true,
     textoEliminar = 'Desactivar',
     textoCrear = 'Nuevo',
+    textoGuardarCreacion = 'Guardar',
     accionesExtra,
     valoresIniciales = {},
     prepararEnvio,
+    camposExtra,
     transformarFilas,
     ordenDescendente = false,
     alCargar,
@@ -97,12 +99,14 @@ export default function CrudPagina({
                     <form onSubmit={crud.guardar}>
                         <Formulario campos={listaCampos} valores={edicion.valores} modo={edicion.modo}
                             alCambiar={(valores) => setEdicion({ ...edicion, valores })} />
+                        {camposExtra?.(edicion.valores, edicion.modo,
+                            (valores) => setEdicion({ ...edicion, valores }))}
                         <Pie>
                             <button type="button" className="btn btn-sec" onClick={() => setEdicion(null)}>
                                 Cancelar
                             </button>
                             <button type="submit" className="btn" disabled={crud.guardando}>
-                                {crud.guardando ? 'Guardando...' : 'Guardar'}
+                                {crud.guardando ? 'Guardando...' : edicion.modo === 'crear' ? textoGuardarCreacion : 'Guardar'}
                             </button>
                         </Pie>
                     </form>

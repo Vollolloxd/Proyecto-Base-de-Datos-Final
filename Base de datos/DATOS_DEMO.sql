@@ -1,10 +1,9 @@
 -- =====================================================================
 -- DATOS PARA LA DEMOSTRACION - VINA LA ALBORADA
---
--- Ejecutar como script (F5) INMEDIATAMENTE DESPUES de
--- script final.sql, sobre el esquema recien instalado (vacio).
--- NO ejecutar los scripts PRUEBAS_* en el mismo esquema: esos usan
--- otros datos. Para volver a cargar: script final.sql y luego este.
+-- 
+-- Este es un script generado por IA, su uso es unicamente con finalidad de
+-- Hacer pruebas de carga de datos y que exista contenido comprobable dentro
+-- de la pagina web. 
 --
 -- Que carga
 --   - Roles, usuarios (administrador, 2 vendedores, clientes web),
@@ -21,18 +20,6 @@
 --       * Rose de Pais queda justo SOBRE su minimo: una venta en vivo
 --         lo hace cruzar y aparece la alerta en la auditoria.
 --       * 2 solicitudes web PENDIENTES para aceptar en vivo.
---
--- Como se carga
---   Todo pasa por los mismos procedimientos que usa la aplicacion (CRUD
---   y gestores G1-G5), asi los datos cumplen todas las reglas. Los
---   gestores registran la fecha del sistema (SYSDATE); para tener
---   historia, despues de cada operacion se mueven sus fechas al dia que
---   corresponde. Durante esta carga historica se desactivan los
---   triggers de auditoria (no son acciones de usuarios) y se reactivan
---   al final: la auditoria queda vacia para registrar la demo en vivo.
---
--- Productos, precios y clientes son DE EJEMPLO (ficticios). Si la viña
--- entrega su catalogo real, se reemplaza en la seccion 2.
 --
 -- Usuarios para la demo (contrasena entre parentesis; la BD guarda solo
 -- su hash scrypt, generado por el backend en Pagina Web/backend/src/claves.js):

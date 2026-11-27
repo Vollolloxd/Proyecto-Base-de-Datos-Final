@@ -2,15 +2,18 @@
 import { api } from './http.js';
 
 export const RUTA_MIS_PEDIDOS = '/cliente/mis-solicitudes';
+export const RUTA_METODOS_PAGO_CLIENTE = `${RUTA_MIS_PEDIDOS}/metodos-pago`;
 const rutaPedido = (idSolicitud) => `${RUTA_MIS_PEDIDOS}/${idSolicitud}`;
 export const rutaProductos = (idSolicitud) => `${rutaPedido(idSolicitud)}/productos`;
 
 export const listar = () => api(RUTA_MIS_PEDIDOS);
 export const crear = () => api(RUTA_MIS_PEDIDOS, { metodo: 'POST', cuerpo: {} });
 export const anular = (idSolicitud) => api(rutaPedido(idSolicitud), { metodo: 'DELETE' });
-export const enviar = (idSolicitud, idMetodoPago) =>
-    api(`${rutaPedido(idSolicitud)}/enviar`, { metodo: 'POST', cuerpo: { ID_METODO_PAGO: idMetodoPago } });
-export const RUTA_METODOS_PAGO_CLIENTE = '/cliente/metodos-pago';
+export const enviar = (idSolicitud, idMetodoPago, producto) =>
+    api(`${rutaPedido(idSolicitud)}/enviar`, {
+        metodo: 'POST',
+        cuerpo: { ID_METODO_PAGO: idMetodoPago, ...producto }
+    });
 
 export const listarProductos = (idSolicitud) => api(rutaProductos(idSolicitud));
 export const agregarProducto = (idSolicitud, idProducto, cantidad) =>

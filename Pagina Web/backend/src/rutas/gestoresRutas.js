@@ -18,7 +18,7 @@ router.post('/ventas/:id/productos', permiso('VENTAS'), ventas.agregarProducto);
 router.post('/ventas/:id/confirmar', permiso('VENTAS'), ventas.confirmar);
 router.post('/ventas/:id/anular', permiso('VENTAS'), ventas.anular);
 
-router.post('/solicitudes/:id/enviar', permiso('SOLICITUDES'), solicitudes.enviar);
-router.post('/solicitudes/:id/resolver', permiso('SOLICITUDES'), solicitudes.resolver);
+router.post('/solicitudes/:id/aceptar', permiso('SOLICITUDES'), solicitudes.aceptar);
+router.post('/solicitudes/:id/anular', permiso('SOLICITUDES'), solicitudes.anular);
 
 module.exports = router;

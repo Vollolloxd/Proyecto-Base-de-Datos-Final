@@ -1,14 +1,11 @@
 // Controlador de ventas: listado, detalle, venta presencial (G2), confirmar con pago (G4) y anular (G5)
+const { randomUUID } = require('node:crypto');
 const ventaModelo = require('../modelos/ventaModelo');
-const pagoServicio = require('../servicios/pagoServicio');
+const { errorApp } = require('../utilidades/errores');
 const asincrono = require('../utilidades/asincrono');
 
 const listar = asincrono(async (req, res) => {
-    const [ventas, elegidos] = await Promise.all([
-        ventaModelo.listar(req.query.estado, req.usuario),
-        pagoServicio.elegidosPorVenta(req.usuario)
-    ]);
-    res.json(ventas.map((v) => ({ ...v, METODO_ELEGIDO: elegidos.get(String(v.ID_VENTA)) || null })));
+    res.json(await ventaModelo.listar(req.query.estado, req.usuario));
 });
 
 const detalle = asincrono(async (req, res) => {
@@ -28,8 +25,14 @@ const agregarProducto = asincrono(async (req, res) => {
 
 const confirmar = asincrono(async (req, res) => {
     const c = req.body || {};
-    const { idMetodo, referencia } = await pagoServicio.datosDeConfirmacion(req.params.id, c.ID_METODO_PAGO, req.usuario);
-    await ventaModelo.confirmar(req.params.id, idMetodo, referencia, req.usuario);
+    const ventas = await ventaModelo.listar(null, req.usuario);
+    const venta = ventas.find((fila) => String(fila.ID_VENTA) === String(req.params.id));
+    if (!venta) throw errorApp(20100, 'VENTA NO ENCONTRADA');
+    if (venta.CANAL_VENTA === 'DIGITAL') {
+        throw errorApp(20314, 'ESTA OPERACION SOLO CONFIRMA VENTAS PRESENCIALES');
+    }
+    const referencia = `VP-${randomUUID().toUpperCase()}`;
+    await ventaModelo.confirmar(req.params.id, c.ID_METODO_PAGO, referencia, req.usuario);
     res.json({ ok: true, REFERENCIA: referencia });
 });
 

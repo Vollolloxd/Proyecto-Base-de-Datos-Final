@@ -20,11 +20,10 @@ export default function Login() {
     return (
         <div className="min-h-screen bg-marfil lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(520px,600px)]">
             <aside aria-hidden="true" className="relative hidden overflow-hidden bg-carbon lg:block">
-                <img src="/img/vinedo.jpg" alt="" className="absolute inset-0 h-full w-full animate-difuminar object-cover" />
+                <img src="/img/vinedo-alborada.webp" alt="" className="absolute inset-0 h-full w-full animate-difuminar object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-carbon/90 via-carbon/20 to-carbon/30" />
                 <div className="absolute inset-x-0 bottom-0 p-12 text-inverso">
                     <p className="max-w-md font-marca text-4xl font-medium leading-tight">Vinos con carácter, desde nuestra viña.</p>
-                    <p className="mt-6 text-xs text-inverso-suave/80">Foto: Winniepix, CC BY 2.0 (Wikimedia Commons)</p>
                 </div>
             </aside>
 

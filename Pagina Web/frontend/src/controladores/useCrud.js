@@ -50,8 +50,12 @@ export function useCrud({
         try {
             const cuerpo = prepararEnvio ? prepararEnvio({ ...edicion.valores }, edicion.modo) : edicion.valores;
             if (edicion.modo === 'crear') {
-                await mantenedoresModelo.crear(recurso, cuerpo);
-                avisar('Registro creado');
+                const resultado = await mantenedoresModelo.crear(recurso, cuerpo);
+                if (resultado?.AVISO) avisar(resultado.AVISO, 'error');
+                else if (recurso === 'productos' && cuerpo.ACTIVAR_AL_GUARDAR) {
+                    if (Number(resultado?.ACTIVO) === 1) avisar('Producto creado y activado');
+                    else avisar('El servidor no confirmó la activación. Revisa el estado del producto en la lista.', 'error');
+                } else avisar('Registro creado');
             } else {
                 await mantenedoresModelo.modificar(recurso, rutaIds(edicion.original), cuerpo);
                 avisar('Cambios guardados');

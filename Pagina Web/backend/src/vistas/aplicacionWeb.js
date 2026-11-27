@@ -10,7 +10,7 @@ function montarAplicacionWeb(app) {
         return false;
     }
     app.use(express.static(carpetaWeb));
-    app.get('*', (req, res) => res.sendFile(path.join(carpetaWeb, 'index.html')));
+    app.get('/{*ruta}', (req, res) => res.sendFile(path.join(carpetaWeb, 'index.html')));
     return true;
 }
 

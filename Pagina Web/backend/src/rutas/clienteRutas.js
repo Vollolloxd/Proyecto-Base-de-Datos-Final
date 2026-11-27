@@ -16,6 +16,7 @@ router.use(autenticar);
 const misSolicitudes = express.Router();
 misSolicitudes.use(permiso('MIS_SOLICITUDES'));
 misSolicitudes.get('/', pedidos.listar);
+misSolicitudes.get('/metodos-pago', pedidos.listarMetodosPago);
 misSolicitudes.post('/', pedidos.crear);
 misSolicitudes.put('/:id', pedidoPropio, pedidos.modificar);
 misSolicitudes.delete('/:id', pedidoPropio, pedidos.anular);
@@ -26,6 +27,5 @@ misSolicitudes.delete('/:id/productos/:idProducto', pedidoPropio, pedidos.quitar
 misSolicitudes.post('/:id/enviar', pedidoPropio, pedidos.enviar);
 
 router.use('/mis-solicitudes', misSolicitudes);
-router.get('/metodos-pago', permiso('MIS_SOLICITUDES'), pedidos.metodosPago);
 
 module.exports = router;
